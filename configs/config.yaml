@@ -1,0 +1,51 @@
+data:
+  city: "Delhi"
+  country: "IN"
+  parameter: "pm25"
+  n_days: 1095          # 3 years of synthetic data
+  train_ratio: 0.80
+  val_ratio: 0.10
+  openaq_base_url: "https://api.openaq.org/v3"
+
+features:
+  target: "pm25"
+  lag_days: [1, 2, 3, 7, 14, 21]
+  rolling_windows: [3, 7, 14, 30]
+  cyclic_features: true   # sin/cos encoding for day-of-year, month
+
+models:
+  xgboost:
+    n_estimators: 500
+    max_depth: 6
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+
+  lightgbm:
+    n_estimators: 500
+    num_leaves: 63
+    learning_rate: 0.05
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+
+  lstm:
+    hidden_size: 128
+    num_layers: 2
+    dropout: 0.2
+    sequence_length: 30
+    batch_size: 64
+    epochs: 50
+    learning_rate: 0.001
+
+training:
+  optuna_trials: 50
+  cv_folds: 5
+  early_stopping_rounds: 50
+  mlflow_experiment: "air-quality-forecasting"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: false

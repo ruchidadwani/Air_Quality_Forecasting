@@ -1,0 +1,53 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: aq-api
+    ports:
+      - "8000:8000"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - OPENAQ_API_KEY=${OPENAQ_API_KEY:-}
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    depends_on:
+      - mlflow
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import httpx; httpx.get('http://localhost:8000/health').raise_for_status()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  dashboard:
+    build: .
+    container_name: aq-dashboard
+    command: streamlit run app/streamlit_app.py --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    restart: unless-stopped
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.11.1
+    container_name: aq-mlflow
+    ports:
+      - "5000:5000"
+    volumes:
+      - mlflow_data:/mlflow
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --backend-store-uri /mlflow/mlruns
+      --default-artifact-root /mlflow/artifacts
+    restart: unless-stopped
+
+volumes:
+  mlflow_data:

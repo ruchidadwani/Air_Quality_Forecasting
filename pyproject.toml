@@ -1,0 +1,81 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "air-quality-forecasting"
+version = "1.0.0"
+description = "Production-grade air quality forecasting system using XGBoost, LightGBM, PyTorch LSTM, and MLflow"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Man Patel", email = "manpatel266@gmail.com" }]
+keywords = ["air-quality", "forecasting", "machine-learning", "time-series", "deep-learning", "mlops"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "polars>=0.20",
+    "scikit-learn>=1.4",
+    "xgboost>=2.0",
+    "lightgbm>=4.3",
+    "torch>=2.2",
+    "optuna>=3.5",
+    "mlflow>=2.11",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "streamlit>=1.33",
+    "plotly>=5.20",
+    "httpx>=0.27",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "python-dotenv>=1.0",
+    "typer>=0.12",
+    "rich>=13.7",
+    "joblib>=1.3",
+    "pyarrow>=15.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.1",
+    "pytest-cov>=5.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.4",
+    "mypy>=1.9",
+]
+
+[project.scripts]
+aq-train = "scripts.train:app"
+aq-predict = "scripts.predict:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/air_quality"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --cov=src/air_quality --cov-report=term-missing"
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
